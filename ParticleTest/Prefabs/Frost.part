@@ -1,0 +1,14 @@
+RotationPerFrame = 0f,
+AlphaLossPerFrame = 0.006f,
+Gravity = 4.0f,
+StartingAlpha = 0.25f,
+ParticlesPerFrame = 5,
+MaxParticles = 9_000,
+ParticleSize = 1f,
+Texture = "swirl.png",
+RandomizeColor = false,
+ColorR_Random 10, 255
+ColorG_Random 10, 255
+ColorB_Random 60, 255
+FinalTint 100 100 200
+FinalTintBlendAlpha 128
