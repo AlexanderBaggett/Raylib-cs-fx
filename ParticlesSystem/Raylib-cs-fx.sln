@@ -5,11 +5,11 @@ VisualStudioVersion = 17.14.36518.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raylib_cs_fx", "Raylib_cs_fx.csproj", "{CC7B257E-5860-EE3A-9F9F-662CCE40E303}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParticleSystem_Testbed", "..\ParticleTest\ParticleSystem_Testbed.csproj", "{1BEF1D11-E57D-C1D4-A9A6-57DBF4B26DC1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParticleSystem_TestBed", "..\ParticleTest\ParticleSystem_TestBed.csproj", "{1BEF1D11-E57D-C1D4-A9A6-57DBF4B26DC1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttractorSystemTestBed", "..\AttractorSystemTestBed\AttractorSystemTestBed.csproj", "{ECE67162-E430-4EE9-B35A-CEEB2AF92F40}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttractorSystem_TestBed", "..\AttractorSystemTestBed\AttractorSystem_TestBed.csproj", "{ECE67162-E430-4EE9-B35A-CEEB2AF92F40}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS_TestBed", "..\SOS_TestBed\SOS_TestBed.csproj", "{22D6EE0A-6ECA-48BB-921A-3019A23FD407}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompoundSystem_TestBed", "..\SOS_TestBed\CompoundSystem_TestBed.csproj", "{22D6EE0A-6ECA-48BB-921A-3019A23FD407}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "..\Benchmarks\Benchmarks.csproj", "{3FF2356E-CC8C-4D92-B0C4-D38D29F4012C}"
 EndProject
@@ -19,8 +19,8 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CC7B257E-5860-EE3A-9F9F-662CCE40E303}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CC7B257E-5860-EE3A-9F9F-662CCE40E303}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC7B257E-5860-EE3A-9F9F-662CCE40E303}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{CC7B257E-5860-EE3A-9F9F-662CCE40E303}.Debug|Any CPU.Build.0 = Release|Any CPU
 		{CC7B257E-5860-EE3A-9F9F-662CCE40E303}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC7B257E-5860-EE3A-9F9F-662CCE40E303}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1BEF1D11-E57D-C1D4-A9A6-57DBF4B26DC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

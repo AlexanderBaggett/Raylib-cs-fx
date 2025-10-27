@@ -15,9 +15,15 @@
     <RepositoryUrl>https://github.com/AlexanderBaggett/Raylib-cs-fx</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>raylib, particle system</PackageTags>
+    <PackageLicenseFile>License.txt</PackageLicenseFile>
+    <Copyright>Alexander Baggett</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\License.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
