@@ -19,7 +19,7 @@ public class AdvancedParticleSystem : IDisposable, ISystem
     public FuncOrVal<float> SystemLifeTime = -1f;
     public float SystemAge = 0f;
     public BlendMode BlendMode = BlendMode.Additive;
-    public FuncOrVal<int> ParticlesPerFrame;
+    public FuncOrVal<int> ParticlesPerSecond;
     public FuncOrVal<int> MaxParticles = 100;
     public FuncOrVal<Particle, float> ParticleStartSize;
     public FuncOrVal<int> ParticleStartSizeJitter = 0;
@@ -110,7 +110,7 @@ public class AdvancedParticleSystem : IDisposable, ISystem
     public void Update(float frameTime)
     {
         // Spawn new particles
-        int particlesToSpawn = ParticlesPerFrame.Value;
+        float particlesToSpawn = ParticlesPerSecond.Value * frameTime;
 
 
         if (SystemLifeTime.Value > 0)

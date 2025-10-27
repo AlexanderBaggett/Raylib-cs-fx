@@ -28,7 +28,7 @@ public class ParticleSystem : IDisposable, ISystem
     public float ParticleLifetimeJitter = 0f;
     public float SystemLifeTime = -1f;
     public float SystemAge = 0f;
-    public int ParticlesPerFrame;
+    public int ParticlesPerSecond;
     public int MaxParticles = 100;
     public float ParticleStartSize;
     public int ParticleStartSizeJitter = 0;
@@ -114,7 +114,7 @@ public class ParticleSystem : IDisposable, ISystem
     public void Update(float frameTime)
     {
         // Spawn new particles
-        int particlesToSpawn = ParticlesPerFrame;
+        float particlesToSpawn = ParticlesPerSecond *frameTime;
 
         if (SystemLifeTime > 0)
         {

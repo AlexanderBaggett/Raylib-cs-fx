@@ -19,7 +19,7 @@ namespace ParticleTest
                 AccelerationPerSecond = new Vector2(0, 900),
                 VelocityJitter = (new Vector2(-500, -500), new Vector2(500, 500)),
                 StartingAlpha = 0.4f,
-                ParticlesPerFrame = 32,
+                ParticlesPerSecond = 32 * 60,
                 MaxParticles = 40_000,
                 ParticleStartSize = 1f,
                 ParticleEndSize = 0.5f,

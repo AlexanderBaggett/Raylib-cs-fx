@@ -23,14 +23,14 @@ namespace AdvancedParticleTestBed
                 SecondaryVelocityJitter = new (new Vector2(-200,-200), new Vector2(200,200)),
                 PrimaryParticleLifetime = 1.1f,
                 SecondaryParticleLifetime = 3,
-                MaxPrimaryParticles = 1000,
-                PrimaryParticlesPerFrame = 5,
-                MaxSecondaryParticlesPerPrimary = 300,
+                MaxPrimaryParticles = 2_000,
+                PrimaryParticlesPerSecond = 20*60,
+                MaxSecondaryParticlesPersecondPerPrimary = 300 * 60,
                 MaxTotalSecondaryParticles = 20_000_00,
                 SecondaryParticleStartSize = 0.5f,
                 SecondaryParticleEndSize =  0.001f,
                 SpawnMode = CompoundParticleSystem.SecondarySpawnMode.OnIntervalDuringPrimaryLifetime,
-                SecondarySpawnInterval = .1f
+                SecondarySpawnInterval = .1f,
             };
 
             particleSystem.Start();

@@ -20,7 +20,7 @@ public class CompoundParticleSystem : IDisposable, ISystem
     public float PrimaryParticleLifetimeJitter = 0f;
     public float SystemLifeTime = -1f;
     public float SystemAge = 0f;
-    public int PrimaryParticlesPerFrame = 1;
+    public int PrimaryParticlesPerSecond = 60;
     public int MaxPrimaryParticles = 50;
     public float PrimaryParticleStartSize = 1f;
     public int PrimaryParticleStartSizeJitter = 0;
@@ -45,7 +45,7 @@ public class CompoundParticleSystem : IDisposable, ISystem
     public float SecondaryParticleLifetime = 1f;
     public float SecondaryParticleLifetimeJitter = 0.3f;
     public int SecondaryParticlesPerPrimary = 5;
-    public int MaxSecondaryParticlesPerPrimary = 10;
+    public int MaxSecondaryParticlesPersecondPerPrimary = 10 *60;
     public int MaxTotalSecondaryParticles = 500;
     public float SecondaryParticleStartSize = 0.5f;
     public int SecondaryParticleStartSizeJitter = 0;
@@ -158,7 +158,7 @@ public class CompoundParticleSystem : IDisposable, ISystem
             secondaryFreeIndices.Push(i);
 
         // Pre-allocate secondary slots for each primary
-        int secondaryBlockSize = MaxSecondaryParticlesPerPrimary;
+        int secondaryBlockSize = MaxSecondaryParticlesPersecondPerPrimary;
         for (int i = 0; i < MaxPrimaryParticles; i++)
         {
             primarySecondaryStartIndices[i] = i * secondaryBlockSize;
@@ -215,11 +215,11 @@ public class CompoundParticleSystem : IDisposable, ISystem
         }
 
         // Spawn new primary particles
-        int particlesToSpawn = PrimaryParticlesPerFrame;
+        float particlesToSpawn = PrimaryParticlesPerSecond * frameTime;
         while (particlesToSpawn > 0 && primaryFreeIndices.Count > 0)
         {
             int index = primaryFreeIndices.Pop();
-            SpawnPrimaryParticle(index);
+            SpawnPrimaryParticle(index, frameTime);
             particlesToSpawn--;
         }
 
@@ -232,7 +232,7 @@ public class CompoundParticleSystem : IDisposable, ISystem
             // Check if particle should die
             if (primaryParticles[particleIndex].Age >= primaryParticles[particleIndex].Lifetime)
             {
-                DespawnPrimaryParticle(i, particleIndex);
+                DespawnPrimaryParticle(i, particleIndex,frameTime);
             }
         }
 
@@ -270,7 +270,7 @@ public class CompoundParticleSystem : IDisposable, ISystem
         );
     }
 
-    private void SpawnPrimaryParticle(int index)
+    private void SpawnPrimaryParticle(int index, float frameTime)
     {
         primaryParticles[index].Age = 0f;
         primaryParticles[index].Lifetime = PrimaryParticleLifetime + (random.NextSingle() * PrimaryParticleLifetimeJitter);
@@ -293,19 +293,19 @@ public class CompoundParticleSystem : IDisposable, ISystem
         // Handle spawn burst
         if (SpawnMode == SecondarySpawnMode.OnPrimarySpawn)
         {
-            SpawnSecondaryBurst(index);
+            SpawnSecondaryBurst(index, frameTime);
         }
     }
 
-    private void UpdatePrimaryParticle(float deltaTime, int particleIndex)
+    private void UpdatePrimaryParticle(float frameTime, int particleIndex)
     {
         ref var particle = ref primaryParticles[particleIndex];
 
         // Update age
-        particle.Age += deltaTime;
+        particle.Age += frameTime;
 
         // Apply acceleration to velocity
-        particle.BaseVelocity += PrimaryAccelerationPerSecond.Value * deltaTime;
+        particle.BaseVelocity += PrimaryAccelerationPerSecond.Value * frameTime;
 
         // Apply velocity
         var particleData = new Particle
@@ -316,11 +316,11 @@ public class CompoundParticleSystem : IDisposable, ISystem
         };
 
         var velocity = PrimaryVelocityPerSecond.Value;
-        particle.Position.X += (velocity.X + particle.BaseVelocity.X) * deltaTime;
-        particle.Position.Y += (velocity.Y + particle.BaseVelocity.Y) * deltaTime;
+        particle.Position.X += (velocity.X + particle.BaseVelocity.X) * frameTime;
+        particle.Position.Y += (velocity.Y + particle.BaseVelocity.Y) * frameTime;
 
         // Apply rotation
-        particle.Rotation += PrimaryRotationPerSecond * deltaTime;
+        particle.Rotation += PrimaryRotationPerSecond * frameTime;
 
         // Calculate lifetime progress
         particle.LifetimeProgress = particle.Age / particle.Lifetime;
@@ -339,17 +339,17 @@ public class CompoundParticleSystem : IDisposable, ISystem
         // Handle continuous/interval spawning
         if (SpawnMode == SecondarySpawnMode.Continuous || SpawnMode == SecondarySpawnMode.OnIntervalDuringPrimaryLifetime)
         {
-            particle.SecondarySpawnTimer += deltaTime;
+            particle.SecondarySpawnTimer += frameTime;
 
             if (particle.SecondarySpawnTimer >= SecondarySpawnInterval)
             {
                 particle.SecondarySpawnTimer -= SecondarySpawnInterval;
-                SpawnSecondaryBurst(particleIndex);
+                SpawnSecondaryBurst(particleIndex,frameTime);
             }
         }
     }
 
-    private void DespawnPrimaryParticle(int activeIndex, int particleIndex)
+    private void DespawnPrimaryParticle(int activeIndex, int particleIndex, float frameTime)
     {
         // Kill all associated secondary particles FIRST (before death burst)
         // Iterate backwards through secondary active list
@@ -365,7 +365,7 @@ public class CompoundParticleSystem : IDisposable, ISystem
         // THEN spawn death burst (after cleanup)
         if (SpawnMode == SecondarySpawnMode.OnPrimaryDeath)
         {
-            SpawnSecondaryBurst(particleIndex);
+            SpawnSecondaryBurst(particleIndex, frameTime);
         }
 
         // Return to free pool
@@ -376,12 +376,12 @@ public class CompoundParticleSystem : IDisposable, ISystem
         primaryActiveCount--;
     }
 
-    private void SpawnSecondaryBurst(int primaryIndex)
+    private void SpawnSecondaryBurst(int primaryIndex, float frameTime)
     {
-        int toSpawn = SecondaryParticlesPerPrimary;
+        float toSpawn = SecondaryParticlesPerPrimary *frameTime;
 
         // Check if we have room in the primary's secondary count
-        if (primaryParticles[primaryIndex].SecondaryActiveCount + toSpawn > MaxSecondaryParticlesPerPrimary)
+        if (primaryParticles[primaryIndex].SecondaryActiveCount + toSpawn > MaxSecondaryParticlesPersecondPerPrimary)
             return;
 
         // Check if we have room in the global secondary pool
