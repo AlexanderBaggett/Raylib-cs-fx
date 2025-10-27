@@ -2,12 +2,6 @@
 
 namespace Raylib_cs_fx;
 
-// Particle structure
-public enum RotationDirectionType
-{
-    One,
-    Both,
-}
 public struct Particle
 {
     public Vector2 Position;
@@ -19,15 +13,15 @@ public struct Particle
     public float Lifetime;
     public float LifetimeProgress;
     public Vector2 BaseVelocity;
-    //public RotationDirectionType rotationType;
+    public Queue<Vector2> TrailKeyframes;
 };
 
-
-public class ParticleSystem : IDisposable
+public class ParticleSystem : IDisposable, ISystem
 {
     public float RotationPerSecond = 0f;
     public int InitialRotationJitter = 0;
-    public Func<Particle,Vector2> VelocityPerSecond;
+    public FuncOrVal<Vector2> VelocityPerSecond;
+    public FuncOrVal<Vector2> AccelerationPerSecond;
     public (Vector2 min, Vector2 max) VelocityJitter = (Vector2.Zero,Vector2.Zero);
     public float StartingAlpha = 1f;
     public float ParticleLifetime = 2f;
@@ -39,8 +33,11 @@ public class ParticleSystem : IDisposable
     public float ParticleStartSize;
     public int ParticleStartSizeJitter = 0;
     public float ParticleEndSize =0;
-    public Texture2D Texture;
     public (Vector2 min, Vector2 max) SpawnPositionJitter = (Vector2.Zero, Vector2.Zero);
+    public int TrailSegments =0;
+    public BlendMode BlendMode = BlendMode.Additive;
+    private ParticleRenderer ParticleRenderer = new CircleRenderer();
+    public TrailSegmentRenderer TrailSegmentRenderer = new LineTrailSegmentRenderer();
     /// <summary>
     /// This Jitter works in reverse
     /// So Red jitter has a randomized reduction effect on the Red Channel between 0 and n
@@ -50,11 +47,7 @@ public class ParticleSystem : IDisposable
     public Color InitialColorJitter = Color.Black; //black is no jitter 
     public Color Tint = Color.White; //white here represents the texture as is
 
-    public Func<Vector2> SpawnPosition = () => GetMousePosition();
-
-    public bool ScaleImage = false;
-    public Rectangle? ScaledSize { get; set; }
-
+    public Func<Vector2> SpawnPosition { get; set; } = () => GetMousePosition();
 
     private Particle[] particles;
     private int[] activeIndices;
@@ -65,11 +58,25 @@ public class ParticleSystem : IDisposable
 
     public ParticleSystem(Texture2D texture)
     {
-        Texture = texture;
         particles = new Particle[MaxParticles];
         activeIndices = new int[MaxParticles];
-        VelocityPerSecond = (_) => Vector2.Zero;
+
+        ParticleRenderer = new TextureParticleRender { Texture = texture };
     }
+    public ParticleSystem()
+    {
+        particles = new Particle[MaxParticles];
+        activeIndices = new int[MaxParticles];
+
+    }
+
+    public ParticleSystem(ParticleRenderer CustomRenderer)
+    {
+        particles = new Particle[MaxParticles];
+        activeIndices = new int[MaxParticles];
+        ParticleRenderer = CustomRenderer;
+    }
+
 
     /// <summary>
     /// Call after updating public fields' values
@@ -86,17 +93,21 @@ public class ParticleSystem : IDisposable
         // Initialize particles
         for (int i = 0; i < MaxParticles; i++)
         {
-            particles[i].Position = new Vector2(0, 0);
-            particles[i].Color = new Color(GetRandomValue(Math.Max(255 - InitialColorJitter.R,0), Tint.R),
+            ref var particle = ref particles[i];
+
+            particle.Position = new Vector2(0, 0);
+            particle.Color = new Color(GetRandomValue(Math.Max(255 - InitialColorJitter.R,0), Tint.R),
                                            GetRandomValue(Math.Max(255 - InitialColorJitter.G,0), Tint.G),
                                            GetRandomValue(Math.Max(255 - InitialColorJitter.B,0), Tint.B), 
                                            255);
-            particles[i].StartSize = (ParticleStartSizeJitter * random.NextSingle())  + ParticleStartSize;
-            particles[i].Size = particles[i].StartSize;
-            particles[i].Rotation = GetRandomValue(0, 0+InitialRotationJitter);
-            particles[i].Age = 0.0f;
-            particles[i].Lifetime = ParticleLifetime + (random.NextSingle() * ParticleLifetimeJitter);
-            particles[i].BaseVelocity = GetVector2Jitter(VelocityJitter);
+            particle.StartSize = (ParticleStartSizeJitter * random.NextSingle())  + ParticleStartSize;
+            particle.Size = particle.StartSize;
+            particle.Rotation = GetRandomValue(0, 0+InitialRotationJitter);
+            particle.Age = 0.0f;
+            particle.Lifetime = ParticleLifetime + (random.NextSingle() * ParticleLifetimeJitter);
+            particle.BaseVelocity = GetVector2Jitter(VelocityJitter);
+            particle.TrailKeyframes = new Queue<Vector2>(TrailSegments);
+           
         }
     }
 
@@ -104,7 +115,6 @@ public class ParticleSystem : IDisposable
     {
         // Spawn new particles
         int particlesToSpawn = ParticlesPerFrame;
-
 
         if (SystemLifeTime > 0)
         {
@@ -146,6 +156,7 @@ public class ParticleSystem : IDisposable
         // Return to free pool
         freeIndices.Push(particleIndex);
 
+        particles[particleIndex].TrailKeyframes.Clear();
         // Remove from active list (swap-and-pop)
         activeIndices[i] = activeIndices[activeCount - 1];
         activeCount--;
@@ -160,21 +171,21 @@ public class ParticleSystem : IDisposable
         );
     }
 
-
     private void UpdateParticle(float deltaTime, int particleIndex)
     {
-
-        //remember these are structs need to use ref here so we don't create a copy
         ref var particle = ref particles[particleIndex];
 
         // Update age
-        particles[particleIndex].Age += deltaTime;
+        particle.Age += deltaTime;
+
+        // Apply acceleration to velocity (accumulate effect over time)
+        var acceleration = AccelerationPerSecond;
+        particle.BaseVelocity += acceleration.Value * deltaTime;
 
         // Apply velocity
-        var velocity = VelocityPerSecond(particle);
-
-        particle.Position.X += (velocity.X +particle.BaseVelocity.X) *deltaTime;
-        particle.Position.Y += (velocity.Y +particle.BaseVelocity.Y) *deltaTime;
+        var velocity = VelocityPerSecond;
+        particle.Position.X += (velocity.Value.X + particle.BaseVelocity.X) * deltaTime;
+        particle.Position.Y += (velocity.Value.Y + particle.BaseVelocity.Y) * deltaTime;
 
         // Apply rotation
         particle.Rotation += RotationPerSecond * deltaTime;
@@ -184,6 +195,14 @@ public class ParticleSystem : IDisposable
 
         // Update size over lifetime (lerp from start to end)
         particle.Size = particle.StartSize + (ParticleEndSize - particle.StartSize) * particle.LifetimeProgress;
+
+        // Update trail if enabled
+        if (TrailSegments > 0)
+        {
+            particle.TrailKeyframes.Enqueue(particle.Position);
+            if (particle.TrailKeyframes.Count > TrailSegments)
+                particle.TrailKeyframes.Dequeue();
+        }
     }
 
     public void Stop() 
@@ -195,42 +214,44 @@ public class ParticleSystem : IDisposable
 
     private void SpawnParticle(int index)
     {
-        particles[index].Age = 0.0f;
-        particles[index].Lifetime = ParticleLifetime + (random.NextSingle() * ParticleLifetimeJitter);
-        particles[index].Position = SpawnPosition() + GetVector2Jitter(SpawnPositionJitter);
-        particles[index].Rotation = GetRandomValue(0, 0 + InitialRotationJitter);
+        ref var particle = ref particles[index];
+
+        particle.Age = 0.0f;
+        particle.Lifetime = ParticleLifetime + (random.NextSingle() * ParticleLifetimeJitter);
+        particle.Position = SpawnPosition() + GetVector2Jitter(SpawnPositionJitter);
+        particle.Rotation = GetRandomValue(0, 0 + InitialRotationJitter);
+        particle.BaseVelocity = GetVector2Jitter(VelocityJitter);
+
+        if (TrailSegments > 0)
+        {
+            var pos = particle.Position;
+            for (int j = 0; j < TrailSegments; j++)
+                particles[index].TrailKeyframes.Enqueue(pos);
+        }
+
         // Add to active list
         activeIndices[activeCount] = index;
         activeCount++;
     }
     public void Draw()
     {
-        BeginBlendMode(BlendMode.Additive);
+        BeginBlendMode(BlendMode);
 
         // Draw active particles
         for (int i = 0; i < activeCount; i++)
         {
             int particleIndex = activeIndices[i];
+            ref var particle = ref particles[particleIndex];
 
-            // lifetimeProgress = p[index].age * p[index].OneOverLifetime
-            float alpha = StartingAlpha * (1.0f - particles[particleIndex].LifetimeProgress);
-
-            DrawTexturePro(Texture,
-                // Original size and position
-                new Rectangle(0.0f, 0.0f, Texture.Width, Texture.Height),
-                // New size and position
-                new Rectangle(particles[particleIndex].Position.X,
-                            particles[particleIndex].Position.Y,
-                            Texture.Width * particles[particleIndex].Size,
-                            Texture.Height * particles[particleIndex].Size),
-                // Origin
-                new Vector2(Texture.Width * particles[particleIndex].Size *0.5f,
-                          Texture.Height * particles[particleIndex].Size  *0.5f),
-                // Rotation  
-                particles[particleIndex].Rotation,
-                // Get color with alpha applied
-                Fade(particles[particleIndex].Color, alpha)
-            );
+            var trailPoints = particle.TrailKeyframes.ToArray();
+            float alpha = StartingAlpha * (1.0f - particle.LifetimeProgress);
+            for (int j = 0; j < trailPoints.Length - 1; j++)
+            {
+                float lerp = (float)(j + 1) / trailPoints.Length;
+                var trailAlpha = lerp * TrailSegmentRenderer.Color.A / 255.0f * alpha;
+                TrailSegmentRenderer.Draw(trailPoints[j], trailPoints[j + 1], trailAlpha);
+            }
+            ParticleRenderer.Draw(particle, alpha);
         }
 
         EndBlendMode();
@@ -238,6 +259,6 @@ public class ParticleSystem : IDisposable
 
     public void Dispose()
     {
-        UnloadTexture(Texture);
+        ParticleRenderer.Dispose();
     }
 }

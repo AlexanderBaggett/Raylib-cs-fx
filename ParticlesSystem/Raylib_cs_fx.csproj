@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Raylib-cs-fx</Title>
+    <Authors>Alexander Baggett</Authors>
+    <Description>A small, optimized vfx library for developers using Raylib-cs. It includes basic stuff such as a particle system.</Description>
+    <PackageProjectUrl>https://github.com/AlexanderBaggett/Raylib-cs-fx</PackageProjectUrl>
+    <PackageIcon>profile pic 2.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/AlexanderBaggett/Raylib-cs-fx</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>raylib, particle system</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="C:\Users\ALEX\Downloads\images\profile pic 2.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Raylib-cs" Version="7.0.2" />
+  </ItemGroup>
+
+</Project>

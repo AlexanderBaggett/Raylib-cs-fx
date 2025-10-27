@@ -26,6 +26,6 @@ public class FXCondition
 public class FXEvent
 {
     public required string Name;
-    public ParticleSystem? ParticleSystem;
+    public ISystem? System;
     public Sound? Sound; //if a sound gets played
 }
