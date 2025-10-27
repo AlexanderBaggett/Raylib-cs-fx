@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Raylib-cs" Version="7.0.1" />
+    <PackageReference Include="Raylib-cs" Version="7.0.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -58,7 +58,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ParticlesSystem\Raylib-cs-fx.csproj" />
+    <ProjectReference Include="..\ParticlesSystem\Raylib_cs_fx.csproj" />
   </ItemGroup>
 
 </Project>

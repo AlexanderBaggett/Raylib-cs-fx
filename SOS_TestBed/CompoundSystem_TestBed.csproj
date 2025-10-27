@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Raylib-cs" Version="7.0.2" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ParticlesSystem\Raylib_cs_fx.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Assets\camo.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Assets\cloud.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Assets\cloud2.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Assets\cloud3.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Assets\fract.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Assets\fract2.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Assets\lines.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Assets\polar.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Assets\shreds.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Assets\squid.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Assets\swirl.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Assets\swirl_faint.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Assets\titan.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
+</Project>

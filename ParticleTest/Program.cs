@@ -16,22 +16,19 @@ namespace ParticleTest
             {
                 RotationPerSecond = 0f,
                 ParticleLifetime = 1f, // Increased to allow visible orbits
-                VelocityPerSecond = (particle) =>
-                {
-                    //simulate some gravity
-                    return new Vector2(0, 400);
-                },
-                VelocityJitter = (new Vector2(-500,-500) ,new Vector2(500, 500)),
+                AccelerationPerSecond = new Vector2(0, 900),
+                VelocityJitter = (new Vector2(-500, -500), new Vector2(500, 500)),
                 StartingAlpha = 0.4f,
-                ParticlesPerFrame = 16,
-                MaxParticles = 20_000,
+                ParticlesPerFrame = 32,
+                MaxParticles = 40_000,
                 ParticleStartSize = 1f,
                 ParticleEndSize = 0.5f,
                 InitialRotationJitter = 360,
                 SpawnPosition = GetMousePosition,
                 //Tint = Color.DarkPurple,
-                SpawnPositionJitter =( new Vector2(-20,-20) ,new Vector2(20, 20))
-
+                SpawnPositionJitter = (new Vector2(-20, -20), new Vector2(20, 20)),
+                TrailSegments = 20,
+                TrailSegmentRenderer = new LineTrailSegmentRenderer { Color = Color.Red, Width = 2 }
             };
 
             particleSystem.Start();
@@ -46,6 +43,7 @@ namespace ParticleTest
                 ClearBackground(Color.DarkGray);
                 particleSystem.Update(GetFrameTime());
                 particleSystem.Draw();
+                DrawFPS(20, 20);
                 EndDrawing();
 
             }
