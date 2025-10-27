@@ -52,5 +52,4 @@ static void Main(string[] args)
     }
     CloseWindow();
 }
-
 ```
