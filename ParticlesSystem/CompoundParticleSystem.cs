@@ -263,9 +263,9 @@ public class CompoundParticleSystem : IDisposable, ISystem
     private Color GetColorWithJitter(Color tint, Color jitter)
     {
         return new Color(
-            GetRandomValue(Math.Max(255 - jitter.R, 0), tint.R),
-            GetRandomValue(Math.Max(255 - jitter.G, 0), tint.G),
-            GetRandomValue(Math.Max(255 - jitter.B, 0), tint.B),
+            GetRandomValue(Math.Max(tint.R - jitter.R, 0), tint.R),
+            GetRandomValue(Math.Max(tint.G - jitter.G, 0), tint.G),
+            GetRandomValue(Math.Max(tint.B - jitter.B, 0), tint.B),
             255
         );
     }
