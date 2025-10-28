@@ -17,6 +17,9 @@
     <PackageTags>raylib, particle system</PackageTags>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
     <Copyright>Alexander Baggett</Copyright>
+    <FileVersion>1.1.0</FileVersion>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+	  <Version>1.1.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

@@ -93,9 +93,9 @@ public class AdvancedParticleSystem : IDisposable, ISystem
 
             ref var particle = ref particles[i];
             particle.Position = new Vector2(0, 0);
-            particle.Color = new Color(GetRandomValue(Math.Max(255 - jitter.R, 0), tint.R),
-                                            GetRandomValue(Math.Max(255 - jitter.G, 0), tint.G),
-                                            GetRandomValue(Math.Max(255 - jitter.B, 0), tint.B),
+            particle.Color = new Color(GetRandomValue(Math.Max(tint.R - jitter.R, 0), tint.R),
+                                            GetRandomValue(Math.Max(tint.G - jitter.G, 0), tint.G),
+                                            GetRandomValue(Math.Max(tint.B - jitter.B, 0), tint.B),
                                             255);
             particle.StartSize = (ParticleStartSizeJitter.Value * random.NextSingle()) + ParticleStartSize.Value(particle);
             particle.Size = particle.StartSize;

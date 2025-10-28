@@ -96,9 +96,9 @@ public class ParticleSystem : IDisposable, ISystem
             ref var particle = ref particles[i];
 
             particle.Position = new Vector2(0, 0);
-            particle.Color = new Color(GetRandomValue(Math.Max(255 - InitialColorJitter.R,0), Tint.R),
-                                           GetRandomValue(Math.Max(255 - InitialColorJitter.G,0), Tint.G),
-                                           GetRandomValue(Math.Max(255 - InitialColorJitter.B,0), Tint.B), 
+            particle.Color = new Color(GetRandomValue(Math.Max(Tint.R - InitialColorJitter.R,0), Tint.R),
+                                           GetRandomValue(Math.Max(Tint.G - InitialColorJitter.G,0), Tint.G),
+                                           GetRandomValue(Math.Max(Tint.B - InitialColorJitter.B,0), Tint.B), 
                                            255);
             particle.StartSize = (ParticleStartSizeJitter * random.NextSingle())  + ParticleStartSize;
             particle.Size = particle.StartSize;
@@ -169,6 +169,12 @@ public class ParticleSystem : IDisposable, ISystem
             jitter.min.X + random.NextSingle() * (jitter.max.X - jitter.min.X),
             jitter.min.Y + random.NextSingle() * (jitter.max.Y - jitter.min.Y)
         );
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private byte GetColorJitter(byte tint, byte jitter)
+    {
+        return 1;
     }
 
     private void UpdateParticle(float deltaTime, int particleIndex)
