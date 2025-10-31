@@ -19,32 +19,21 @@ public struct Particle
 public class ParticleSystem : IDisposable, ISystem
 {
     public float RotationPerSecond = 0f;
-    public int InitialRotationJitter = 0;
     public FuncOrVal<Vector2> VelocityPerSecond;
     public FuncOrVal<Vector2> AccelerationPerSecond;
-    public (Vector2 min, Vector2 max) VelocityJitter = (Vector2.Zero,Vector2.Zero);
     public float StartingAlpha = 1f;
     public float ParticleLifetime = 2f;
-    public float ParticleLifetimeJitter = 0f;
     public float SystemLifeTime = -1f;
     public float SystemAge = 0f;
     public int ParticlesPerSecond;
     public int MaxParticles = 100;
     public float ParticleStartSize;
-    public int ParticleStartSizeJitter = 0;
     public float ParticleEndSize =0;
-    public (Vector2 min, Vector2 max) SpawnPositionJitter = (Vector2.Zero, Vector2.Zero);
     public int TrailSegments =0;
     public BlendMode BlendMode = BlendMode.Additive;
     private ParticleRenderer ParticleRenderer = new CircleRenderer();
     public TrailSegmentRenderer TrailSegmentRenderer = new LineTrailSegmentRenderer();
-    /// <summary>
-    /// This Jitter works in reverse
-    /// So Red jitter has a randomized reduction effect on the Red Channel between 0 and n
-    /// So that channel doesn't exceed 255
-    /// This will error if a channel goes less than 0
-    /// </summary>
-    public Color InitialColorJitter = Color.Black; //black is no jitter 
+    public ParticleEmitter ParticleEmitter = new DefaultEmitter();
     public Color Tint = Color.White; //white here represents the texture as is
 
     public Func<Vector2> SpawnPosition { get; set; } = () => GetMousePosition();
@@ -54,7 +43,6 @@ public class ParticleSystem : IDisposable, ISystem
     private int activeCount = 0;
     private Stack<int> freeIndices = new Stack<int>();
     private Random random = new Random();
-
 
     public ParticleSystem(Texture2D texture)
     {
@@ -67,7 +55,6 @@ public class ParticleSystem : IDisposable, ISystem
     {
         particles = new Particle[MaxParticles];
         activeIndices = new int[MaxParticles];
-
     }
 
     public ParticleSystem(ParticleRenderer CustomRenderer)
@@ -77,37 +64,26 @@ public class ParticleSystem : IDisposable, ISystem
         ParticleRenderer = CustomRenderer;
     }
 
-
     /// <summary>
-    /// Call after updating public fields' values
+    /// Call after updating public fields values
     /// </summary>
     public void Start()
     {
         particles = new Particle[MaxParticles];
         activeIndices = new int[MaxParticles];
         freeIndices = new Stack<int>();
+        activeCount = 0;
 
         for (int i = MaxParticles - 1; i >= 0; i--)
             freeIndices.Push(i);
 
-        // Initialize particles
+        // Initialize particle structs (minimal defaults)
         for (int i = 0; i < MaxParticles; i++)
         {
-            ref var particle = ref particles[i];
-
-            particle.Position = new Vector2(0, 0);
-            particle.Color = new Color(GetRandomValue(Math.Max(Tint.R - InitialColorJitter.R,0), Tint.R),
-                                           GetRandomValue(Math.Max(Tint.G - InitialColorJitter.G,0), Tint.G),
-                                           GetRandomValue(Math.Max(Tint.B - InitialColorJitter.B,0), Tint.B), 
-                                           255);
-            particle.StartSize = (ParticleStartSizeJitter * random.NextSingle())  + ParticleStartSize;
-            particle.Size = particle.StartSize;
-            particle.Rotation = GetRandomValue(0, 0+InitialRotationJitter);
-            particle.Age = 0.0f;
-            particle.Lifetime = ParticleLifetime + (random.NextSingle() * ParticleLifetimeJitter);
-            particle.BaseVelocity = GetVector2Jitter(VelocityJitter);
-            particle.TrailKeyframes = new Queue<Vector2>(TrailSegments);
-           
+            particles[i] = new Particle
+            {
+                TrailKeyframes = new Queue<Vector2>(TrailSegments + 1)
+            };
         }
     }
 
@@ -162,21 +138,6 @@ public class ParticleSystem : IDisposable, ISystem
         activeCount--;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private Vector2 GetVector2Jitter((Vector2 min, Vector2 max) jitter)
-    {
-        return new Vector2(
-            jitter.min.X + random.NextSingle() * (jitter.max.X - jitter.min.X),
-            jitter.min.Y + random.NextSingle() * (jitter.max.Y - jitter.min.Y)
-        );
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private byte GetColorJitter(byte tint, byte jitter)
-    {
-        return 1;
-    }
-
     private void UpdateParticle(float deltaTime, int particleIndex)
     {
         ref var particle = ref particles[particleIndex];
@@ -223,10 +184,7 @@ public class ParticleSystem : IDisposable, ISystem
         ref var particle = ref particles[index];
 
         particle.Age = 0.0f;
-        particle.Lifetime = ParticleLifetime + (random.NextSingle() * ParticleLifetimeJitter);
-        particle.Position = SpawnPosition() + GetVector2Jitter(SpawnPositionJitter);
-        particle.Rotation = GetRandomValue(0, 0 + InitialRotationJitter);
-        particle.BaseVelocity = GetVector2Jitter(VelocityJitter);
+        ParticleEmitter.Emit(ref particle, random, SpawnPosition(), ParticleLifetime, ParticleStartSize, Tint);
 
         if (TrailSegments > 0)
         {

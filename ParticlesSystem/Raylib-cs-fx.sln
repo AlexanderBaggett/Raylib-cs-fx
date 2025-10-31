@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompoundSystem_TestBed", ".
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "..\Benchmarks\Benchmarks.csproj", "{3FF2356E-CC8C-4D92-B0C4-D38D29F4012C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdvancedParticleSystem_TestBed", "..\AdvancedParticleSystem_TestBed\AdvancedParticleSystem_TestBed.csproj", "{907E3EEC-5085-400C-9872-15474767B76C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{3FF2356E-CC8C-4D92-B0C4-D38D29F4012C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3FF2356E-CC8C-4D92-B0C4-D38D29F4012C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FF2356E-CC8C-4D92-B0C4-D38D29F4012C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{907E3EEC-5085-400C-9872-15474767B76C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{907E3EEC-5085-400C-9872-15474767B76C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{907E3EEC-5085-400C-9872-15474767B76C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{907E3EEC-5085-400C-9872-15474767B76C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
