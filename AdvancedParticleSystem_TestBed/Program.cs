@@ -1,7 +1,7 @@
-﻿
-using Raylib_cs_fx;
+﻿using Raylib_cs_fx;
+using System.Numerics;
 
-namespace ParticleTest;
+namespace AdvancedParticleSystem_TestBed;
 
 internal class Program
 {
@@ -12,28 +12,23 @@ internal class Program
 
         InitWindow(screenWidth, screenHeight, "Particles!");
 
-        using ParticleSystem particleSystem = new ParticleSystem(LoadTexture("Assets/cloud3.png"))
+        using AdvancedParticleSystem particleSystem = new AdvancedParticleSystem(LoadTexture("Assets/cloud3.png"))
         {
             RotationPerSecond = 0f,
             ParticleLifetime = 1f, // Increased to allow visible orbits
-            AccelerationPerSecond = new Vector2(0, 900),
-            StartingAlpha = 1f,
-            ParticlesPerSecond = 120 * 60,
+            AccelerationPersecond = new Vector2(0, 900),
+            VelocityJitter = (new Vector2(-500, -500), new Vector2(500, 500)),
+            StartingAlpha = 0.4f,
+            ParticlesPerSecond = 20 * 60,
             MaxParticles = 40_000,
-            ParticleStartSize = 0.12f,
-            ParticleEndSize = 0.052f,
-
+            ParticleStartSize = 1f,
+            ParticleEndSize = 0.5f,
+            InitialRotationJitter = 180,
             SpawnPosition = GetMousePosition,
             Tint = Color.Magenta,
-            TrailSegments = 0,
-            ParticleEmitter = new TriangleEmitter(200f)
-            {
-                //ColorJitter = Color.Green,
-                SpawnPositionJitter = (new Vector2(-4, -4), new Vector2(4, 4)),
-                //VelocityJitter = (new Vector2(-500, -500), new Vector2(500, 500)),
-                RotationJitter = 180,
-                LifetimeJitter = 1f
-            }
+            InitialColorJitter = Color.Green,
+            SpawnPositionJitter = (new Vector2(-200, -200), new Vector2(200, 200)),
+            Segments =new Func<Particle,TrailSegmentRenderer[]>((particle) => Enumerable.Repeat(new LineTrailSegmentRenderer(), 10).ToArray()),
         };
 
         particleSystem.Start();
@@ -43,14 +38,12 @@ internal class Program
 
         while (!WindowShouldClose())
         {
-         
             BeginDrawing();
             ClearBackground(Color.DarkGray);
             particleSystem.Update(GetFrameTime());
             particleSystem.Draw();
             DrawFPS(20, 20);
             EndDrawing();
-
         }
         CloseWindow();
     }
